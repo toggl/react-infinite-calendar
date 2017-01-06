@@ -31,6 +31,9 @@ export function getMonthsForYear(year, min, max) {
         months = moment().range('year');
     }
 
+    months.start.hour(12)
+    months.end.hour(12)
+
     return months.toArray('months');
 }
 
