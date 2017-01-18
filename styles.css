@@ -76,7 +76,6 @@
   .Cal__Header__root.Cal__Header__landscape {
     -webkit-box-align: start;
         -ms-flex-align: start;
-                -ms-grid-row-align: flex-start;
             align-items: flex-start;
     min-width: 200px;
     border-top-right-radius: 0;
