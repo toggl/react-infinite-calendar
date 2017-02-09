@@ -1,5 +1,5 @@
 # TOGGL FORK: YOU MUST CHECK IN YOUR 'npm run build' RESULTS (dist/)!!!
-## This is to work around deficiencies in the react-infinite-calendar build process.
+## This is to work around difficulties in importing react-infinite-calendar.
 
 <div align="center" style="margin-bottom: 30px;">
 <img src="https://raw.githubusercontent.com/clauderic/react-infinite-calendar/master/.github/logo.png" width="250"/>
