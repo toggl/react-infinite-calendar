@@ -10,7 +10,7 @@ export default function Day({currentYear, date, day, handleDayClick, isDisabled,
 			style={(isToday) ? {color: theme.todayColor} : null}
 			className={`${style.root}${isToday ? ' ' + style.today : ''}${isSelected ? ' ' + style.selected : ''}${isDisabled ? ' ' + style.disabled : ' ' + style.enabled}`}
 			data-date={yyyymmdd}
-			onClick={(!isDisabled && handleDayClick) ? handleDayClick.bind(this, mmt) : null}
+			onClick={(!isDisabled && handleDayClick) ? (e) => handleDayClick.call(this, mmt, e) : null}
 		>
 			{(day === 1) && <span className={style.month}>{monthShort}</span>}
 			<span>{day}</span>
