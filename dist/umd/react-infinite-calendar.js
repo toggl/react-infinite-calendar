@@ -25573,6 +25573,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	var style = __webpack_require__(209);
 
 	function Day(_ref) {
+		var _this = this;
+
 		var currentYear = _ref.currentYear,
 		    date = _ref.date,
 		    day = _ref.day,
@@ -25594,7 +25596,9 @@ return /******/ (function(modules) { // webpackBootstrap
 				style: isToday ? { color: theme.todayColor } : null,
 				className: '' + style.root + (isToday ? ' ' + style.today : '') + (isSelected ? ' ' + style.selected : '') + (isDisabled ? ' ' + style.disabled : ' ' + style.enabled),
 				'data-date': yyyymmdd,
-				onClick: !isDisabled && handleDayClick ? handleDayClick.bind(this, mmt) : null
+				onClick: !isDisabled && handleDayClick ? function (e) {
+					return handleDayClick.call(_this, mmt, e);
+				} : null
 			},
 			day === 1 && _react2.default.createElement(
 				'span',

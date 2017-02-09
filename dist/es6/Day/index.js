@@ -13,6 +13,8 @@ var style = {
 };
 
 export default function Day(_ref) {
+	var _this = this;
+
 	var currentYear = _ref.currentYear,
 	    date = _ref.date,
 	    day = _ref.day,
@@ -34,7 +36,9 @@ export default function Day(_ref) {
 			style: isToday ? { color: theme.todayColor } : null,
 			className: '' + style.root + (isToday ? ' ' + style.today : '') + (isSelected ? ' ' + style.selected : '') + (isDisabled ? ' ' + style.disabled : ' ' + style.enabled),
 			'data-date': yyyymmdd,
-			onClick: !isDisabled && handleDayClick ? handleDayClick.bind(this, mmt) : null
+			onClick: !isDisabled && handleDayClick ? function (e) {
+				return handleDayClick.call(_this, mmt, e);
+			} : null
 		},
 		day === 1 && React.createElement(
 			'span',
