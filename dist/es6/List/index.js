@@ -136,12 +136,15 @@ var List = function (_Component) {
 			    rowHeight = _props.rowHeight,
 			    selectedDate = _props.selectedDate,
 			    today = _props.today,
-			    width = _props.width;
+			    width = _props.width,
+			    style = _props.style;
 
 			if (!this._initScrollTop) this._initScrollTop = this.getDateOffset(selectedDate && selectedDate.date || today.date);
 			if (typeof width == 'string' && width.indexOf('%') !== -1) {
 				width = window.innerWidth * parseInt(width.replace('%', ''), 10) / 100; // See https://github.com/bvaughn/react-virtualized/issues/229
 			}
+
+			var containerStyle = babelHelpers.extends({}, this.props.style, { lineHeight: rowHeight + 'px' });
 
 			return React.createElement(VirtualScroll, {
 				ref: 'VirtualScroll',
@@ -154,7 +157,7 @@ var List = function (_Component) {
 				onScroll: onScroll,
 				scrollTop: this._initScrollTop,
 				className: classNames(style.root, babelHelpers.defineProperty({}, style.scrolling, isScrolling)),
-				style: { lineHeight: rowHeight + 'px' },
+				style: containerStyle,
 				overscanRowCount: overscanMonthCount
 			});
 		}
@@ -165,6 +168,7 @@ var List = function (_Component) {
 List.propTypes = {
 	width: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
 	height: PropTypes.number,
+	style: PropTypes.object,
 	rowHeight: PropTypes.number,
 	selectedDate: PropTypes.object,
 	disabledDates: PropTypes.arrayOf(PropTypes.string),

@@ -4,6 +4,8 @@ Object.defineProperty(exports, "__esModule", {
 	value: true
 });
 
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 var _react = require('react');
@@ -168,12 +170,15 @@ var List = function (_Component) {
 			    rowHeight = _props.rowHeight,
 			    selectedDate = _props.selectedDate,
 			    today = _props.today,
-			    width = _props.width;
+			    width = _props.width,
+			    style = _props.style;
 
 			if (!this._initScrollTop) this._initScrollTop = this.getDateOffset(selectedDate && selectedDate.date || today.date);
 			if (typeof width == 'string' && width.indexOf('%') !== -1) {
 				width = window.innerWidth * parseInt(width.replace('%', ''), 10) / 100; // See https://github.com/bvaughn/react-virtualized/issues/229
 			}
+
+			var containerStyle = _extends({}, this.props.style, { lineHeight: rowHeight + 'px' });
 
 			return _react2.default.createElement(_reactVirtualized.List, {
 				ref: 'VirtualScroll',
@@ -186,7 +191,7 @@ var List = function (_Component) {
 				onScroll: onScroll,
 				scrollTop: this._initScrollTop,
 				className: (0, _classnames2.default)(style.root, _defineProperty({}, style.scrolling, isScrolling)),
-				style: { lineHeight: rowHeight + 'px' },
+				style: containerStyle,
 				overscanRowCount: overscanMonthCount
 			});
 		}
@@ -198,6 +203,7 @@ var List = function (_Component) {
 List.propTypes = {
 	width: _react.PropTypes.oneOfType([_react.PropTypes.number, _react.PropTypes.string]),
 	height: _react.PropTypes.number,
+	style: _react.PropTypes.object,
 	rowHeight: _react.PropTypes.number,
 	selectedDate: _react.PropTypes.object,
 	disabledDates: _react.PropTypes.arrayOf(_react.PropTypes.string),
