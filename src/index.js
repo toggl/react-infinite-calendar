@@ -108,7 +108,8 @@ export default class InfiniteCalendar extends Component {
 		if (next.min !== min || next.minDate !== minDate || next.max !== max || next.maxDate !== maxDate) {
 			this.updateYears(next);
 		}
-		if (next.selectedDate !== selectedDate) {
+		const nextSelectedDate = moment(next.selectedDate)
+		if (!nextSelectedDate.isSame(selectedDate, 'day') && !nextSelectedDate.isSame(this.state.selectedDate, 'day')) {
 			var parsed = this.parseSelectedDate(next.selectedDate);
 			this.setState({
 				selectedDate: parsed
@@ -170,15 +171,14 @@ export default class InfiniteCalendar extends Component {
 		let {afterSelect, beforeSelect, onSelect} = this.props;
 
 		if (!beforeSelect || typeof beforeSelect == 'function' && beforeSelect(selectedDate)) {
-			if (typeof onSelect == 'function') {
-				onSelect(selectedDate, e);
-			}
-
 			this.setState({
 				selectedDate,
 				shouldHeaderAnimate,
 				highlightedDate: selectedDate.clone()
 			}, () => {
+				if (typeof onSelect == 'function') {
+					onSelect(selectedDate);
+				}
 				this.clearHighlight();
 				if (typeof afterSelect == 'function') {
 					afterSelect(selectedDate);
