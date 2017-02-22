@@ -158,15 +158,14 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 				if (!beforeSelect || typeof beforeSelect == 'function' && beforeSelect(selectedDate)) {
-					if (typeof onSelect == 'function') {
-						onSelect(selectedDate, e);
-					}
-
 					_this.setState({
 						selectedDate: selectedDate,
 						shouldHeaderAnimate: shouldHeaderAnimate,
 						highlightedDate: selectedDate.clone()
 					}, function () {
+						if (typeof onSelect == 'function') {
+							onSelect(selectedDate);
+						}
 						_this.clearHighlight();
 						if (typeof afterSelect == 'function') {
 							afterSelect(selectedDate);
@@ -411,7 +410,8 @@ return /******/ (function(modules) { // webpackBootstrap
 				if (next.min !== min || next.minDate !== minDate || next.max !== max || next.maxDate !== maxDate) {
 					this.updateYears(next);
 				}
-				if (next.selectedDate !== selectedDate) {
+				var nextSelectedDate = (0, _moment2.default)(next.selectedDate);
+				if (!nextSelectedDate.isSame(selectedDate, 'day') && !nextSelectedDate.isSame(this.state.selectedDate, 'day')) {
 					var parsed = this.parseSelectedDate(next.selectedDate);
 					this.setState({
 						selectedDate: parsed
