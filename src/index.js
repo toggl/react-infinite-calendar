@@ -370,6 +370,7 @@ export default class InfiniteCalendar extends Component {
 			showHeader,
 			tabIndex,
 			width,
+			rowHeight,
 			...other
 		} = this.props;
 		let disabledDates = this.getDisabledDates(this.props.disabledDates);
@@ -383,6 +384,12 @@ export default class InfiniteCalendar extends Component {
 			selectedDate = null;
 		}
 
+		// To have visible overscan we trick react-virtualized into thinking that the container is larger than it actually is and thus
+		// the previous/next month is "in view" for longer. We need this because our react-virtualized items are overlapping.
+		// PR that causes the problem: https://github.com/bvaughn/react-virtualized/pull/478
+		const listHeight = height + rowHeight * 2
+		const listStyle = { top: `-${rowHeight}px` }
+
 		return (
 			<div tabIndex={tabIndex} onKeyDown={keyboardSupport && this.handleKeyDown} className={classNames(className, style.container.root, {[style.container.landscape]: layout == 'landscape'})} style={{color: theme.textColor.default, width}} aria-label="Calendar" ref="node">
 				{showHeader &&
@@ -394,26 +401,30 @@ export default class InfiniteCalendar extends Component {
 						{showTodayHelper &&
 							<Today scrollToDate={this.scrollToDate} show={showToday} today={today} theme={theme} locale={locale} />
 						}
-						<List
-							ref="List"
-							{...other}
-							width={width}
-							height={height}
-							selectedDate={parseDate(selectedDate)}
-							disabledDates={disabledDates}
-							disabledDays={disabledDays}
-							months={this.months}
-							onDaySelect={this.onDaySelect}
-							onScroll={this.onScroll}
-							isScrolling={isScrolling}
-							today={today}
-							min={parseDate(min)}
-							minDate={parseDate(minDate)}
-							maxDate={parseDate(maxDate)}
-							theme={theme}
-							locale={locale}
-							overscanMonthCount={overscanMonthCount}
-						/>
+						<div style={{height: `${height}px`}}>
+							<List
+								ref="List"
+								{...other}
+								width={width}
+								height={listHeight}
+								rowHeight={rowHeight}
+								style={listStyle}
+								selectedDate={parseDate(selectedDate)}
+								disabledDates={disabledDates}
+								disabledDays={disabledDays}
+								months={this.months}
+								onDaySelect={this.onDaySelect}
+								onScroll={this.onScroll}
+								isScrolling={isScrolling}
+								today={today}
+								min={parseDate(min)}
+								minDate={parseDate(minDate)}
+								maxDate={parseDate(maxDate)}
+								theme={theme}
+								locale={locale}
+								overscanMonthCount={overscanMonthCount}
+							/>
+						</div>
 					</div>
 					{display == 'years' &&
 						<Years

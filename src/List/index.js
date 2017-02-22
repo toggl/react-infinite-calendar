@@ -10,6 +10,7 @@ export default class List extends Component {
 	static propTypes = {
 		width: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
 		height: PropTypes.number,
+		style: PropTypes.object,
 		rowHeight: PropTypes.number,
 		selectedDate: PropTypes.object,
 		disabledDates: PropTypes.arrayOf(PropTypes.string),
@@ -106,11 +107,13 @@ export default class List extends Component {
 		);
 	};
 	render() {
-		let {height, isScrolling, onScroll, overscanMonthCount, months, rowHeight, selectedDate, today, width} = this.props;
+		let {height, isScrolling, onScroll, overscanMonthCount, months, rowHeight, selectedDate, today, width, style} = this.props;
 		if (!this._initScrollTop) this._initScrollTop = this.getDateOffset(selectedDate && selectedDate.date || today.date);
 		if (typeof width == 'string' && width.indexOf('%') !== -1) {
 			width = window.innerWidth * parseInt(width.replace('%', ''), 10) / 100; // See https://github.com/bvaughn/react-virtualized/issues/229
 		}
+
+		const containerStyle = { ...this.props.style, lineHeight: `${rowHeight}px` }
 
 		return (
 			<VirtualScroll
@@ -124,7 +127,7 @@ export default class List extends Component {
 				onScroll={onScroll}
 				scrollTop={this._initScrollTop}
 				className={classNames(style.root, {[style.scrolling]: isScrolling})}
-				style={{lineHeight: `${rowHeight}px`}}
+				style={containerStyle}
 				overscanRowCount={overscanMonthCount}
 			/>
 		);
