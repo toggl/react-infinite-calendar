@@ -413,7 +413,8 @@ var InfiniteCalendar = function (_Component) {
 			    showHeader = _props3.showHeader,
 			    tabIndex = _props3.tabIndex,
 			    width = _props3.width,
-			    other = babelHelpers.objectWithoutProperties(_props3, ['className', 'disabledDays', 'height', 'hideYearsOnSelect', 'keyboardSupport', 'layout', 'overscanMonthCount', 'min', 'minDate', 'max', 'maxDate', 'showTodayHelper', 'showHeader', 'tabIndex', 'width']);
+			    rowHeight = _props3.rowHeight,
+			    other = babelHelpers.objectWithoutProperties(_props3, ['className', 'disabledDays', 'height', 'hideYearsOnSelect', 'keyboardSupport', 'layout', 'overscanMonthCount', 'min', 'minDate', 'max', 'maxDate', 'showTodayHelper', 'showHeader', 'tabIndex', 'width', 'rowHeight']);
 
 			var disabledDates = this.getDisabledDates(this.props.disabledDates);
 			var locale = this.getLocale();
@@ -432,6 +433,12 @@ var InfiniteCalendar = function (_Component) {
 				selectedDate = null;
 			}
 
+			// To have visible overscan we trick react-virtualized into thinking that the container is larger than it actually is and thus
+			// the previous/next month is "in view" for longer. We need this because our react-virtualized items are overlapping.
+			// PR that causes the problem: https://github.com/bvaughn/react-virtualized/pull/478
+			var listHeight = height + rowHeight * 2;
+			var listStyle = { top: '-' + rowHeight + 'px' };
+
 			return React.createElement(
 				'div',
 				{ tabIndex: tabIndex, onKeyDown: keyboardSupport && this.handleKeyDown, className: classNames(className, style.container.root, babelHelpers.defineProperty({}, style.container.landscape, layout == 'landscape')), style: { color: theme.textColor.default, width: width }, 'aria-label': 'Calendar', ref: 'node' },
@@ -444,26 +451,32 @@ var InfiniteCalendar = function (_Component) {
 						'div',
 						{ className: style.container.listWrapper },
 						showTodayHelper && React.createElement(Today, { scrollToDate: this.scrollToDate, show: showToday, today: today, theme: theme, locale: locale }),
-						React.createElement(List, babelHelpers.extends({
-							ref: 'List'
-						}, other, {
-							width: width,
-							height: height,
-							selectedDate: parseDate(selectedDate),
-							disabledDates: disabledDates,
-							disabledDays: disabledDays,
-							months: this.months,
-							onDaySelect: this.onDaySelect,
-							onScroll: this.onScroll,
-							isScrolling: isScrolling,
-							today: today,
-							min: parseDate(min),
-							minDate: parseDate(minDate),
-							maxDate: parseDate(maxDate),
-							theme: theme,
-							locale: locale,
-							overscanMonthCount: overscanMonthCount
-						}))
+						React.createElement(
+							'div',
+							{ style: { height: height + 'px' } },
+							React.createElement(List, babelHelpers.extends({
+								ref: 'List'
+							}, other, {
+								width: width,
+								height: listHeight,
+								rowHeight: rowHeight,
+								style: listStyle,
+								selectedDate: parseDate(selectedDate),
+								disabledDates: disabledDates,
+								disabledDays: disabledDays,
+								months: this.months,
+								onDaySelect: this.onDaySelect,
+								onScroll: this.onScroll,
+								isScrolling: isScrolling,
+								today: today,
+								min: parseDate(min),
+								minDate: parseDate(minDate),
+								maxDate: parseDate(maxDate),
+								theme: theme,
+								locale: locale,
+								overscanMonthCount: overscanMonthCount
+							}))
+						)
 					),
 					display == 'years' && React.createElement(Years, {
 						ref: 'years',

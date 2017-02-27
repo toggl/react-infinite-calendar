@@ -518,7 +518,8 @@ return /******/ (function(modules) { // webpackBootstrap
 				    showHeader = _props3.showHeader,
 				    tabIndex = _props3.tabIndex,
 				    width = _props3.width,
-				    other = _objectWithoutProperties(_props3, ['className', 'disabledDays', 'height', 'hideYearsOnSelect', 'keyboardSupport', 'layout', 'overscanMonthCount', 'min', 'minDate', 'max', 'maxDate', 'showTodayHelper', 'showHeader', 'tabIndex', 'width']);
+				    rowHeight = _props3.rowHeight,
+				    other = _objectWithoutProperties(_props3, ['className', 'disabledDays', 'height', 'hideYearsOnSelect', 'keyboardSupport', 'layout', 'overscanMonthCount', 'min', 'minDate', 'max', 'maxDate', 'showTodayHelper', 'showHeader', 'tabIndex', 'width', 'rowHeight']);
 
 				var disabledDates = this.getDisabledDates(this.props.disabledDates);
 				var locale = this.getLocale();
@@ -537,6 +538,12 @@ return /******/ (function(modules) { // webpackBootstrap
 					selectedDate = null;
 				}
 
+				// To have visible overscan we trick react-virtualized into thinking that the container is larger than it actually is and thus
+				// the previous/next month is "in view" for longer. We need this because our react-virtualized items are overlapping.
+				// PR that causes the problem: https://github.com/bvaughn/react-virtualized/pull/478
+				var listHeight = height + rowHeight * 2;
+				var listStyle = { top: '-' + rowHeight + 'px' };
+
 				return _react2.default.createElement(
 					'div',
 					{ tabIndex: tabIndex, onKeyDown: keyboardSupport && this.handleKeyDown, className: (0, _classnames2.default)(className, style.container.root, _defineProperty({}, style.container.landscape, layout == 'landscape')), style: { color: theme.textColor.default, width: width }, 'aria-label': 'Calendar', ref: 'node' },
@@ -549,26 +556,32 @@ return /******/ (function(modules) { // webpackBootstrap
 							'div',
 							{ className: style.container.listWrapper },
 							showTodayHelper && _react2.default.createElement(_Today2.default, { scrollToDate: this.scrollToDate, show: showToday, today: today, theme: theme, locale: locale }),
-							_react2.default.createElement(_List2.default, _extends({
-								ref: 'List'
-							}, other, {
-								width: width,
-								height: height,
-								selectedDate: (0, _utils.parseDate)(selectedDate),
-								disabledDates: disabledDates,
-								disabledDays: disabledDays,
-								months: this.months,
-								onDaySelect: this.onDaySelect,
-								onScroll: this.onScroll,
-								isScrolling: isScrolling,
-								today: today,
-								min: (0, _utils.parseDate)(min),
-								minDate: (0, _utils.parseDate)(minDate),
-								maxDate: (0, _utils.parseDate)(maxDate),
-								theme: theme,
-								locale: locale,
-								overscanMonthCount: overscanMonthCount
-							}))
+							_react2.default.createElement(
+								'div',
+								{ style: { height: height + 'px' } },
+								_react2.default.createElement(_List2.default, _extends({
+									ref: 'List'
+								}, other, {
+									width: width,
+									height: listHeight,
+									rowHeight: rowHeight,
+									style: listStyle,
+									selectedDate: (0, _utils.parseDate)(selectedDate),
+									disabledDates: disabledDates,
+									disabledDays: disabledDays,
+									months: this.months,
+									onDaySelect: this.onDaySelect,
+									onScroll: this.onScroll,
+									isScrolling: isScrolling,
+									today: today,
+									min: (0, _utils.parseDate)(min),
+									minDate: (0, _utils.parseDate)(minDate),
+									maxDate: (0, _utils.parseDate)(maxDate),
+									theme: theme,
+									locale: locale,
+									overscanMonthCount: overscanMonthCount
+								}))
+							)
 						),
 						display == 'years' && _react2.default.createElement(_Years2.default, {
 							ref: 'years',
@@ -17541,6 +17554,8 @@ return /******/ (function(modules) { // webpackBootstrap
 		value: true
 	});
 
+	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 	var _react = __webpack_require__(2);
@@ -17702,12 +17717,15 @@ return /******/ (function(modules) { // webpackBootstrap
 				    rowHeight = _props.rowHeight,
 				    selectedDate = _props.selectedDate,
 				    today = _props.today,
-				    width = _props.width;
+				    width = _props.width,
+				    style = _props.style;
 
 				if (!this._initScrollTop) this._initScrollTop = this.getDateOffset(selectedDate && selectedDate.date || today.date);
 				if (typeof width == 'string' && width.indexOf('%') !== -1) {
 					width = window.innerWidth * parseInt(width.replace('%', ''), 10) / 100; // See https://github.com/bvaughn/react-virtualized/issues/229
 				}
+
+				var containerStyle = _extends({}, this.props.style, { lineHeight: rowHeight + 'px' });
 
 				return _react2.default.createElement(_reactVirtualized.List, {
 					ref: 'VirtualScroll',
@@ -17720,7 +17738,7 @@ return /******/ (function(modules) { // webpackBootstrap
 					onScroll: onScroll,
 					scrollTop: this._initScrollTop,
 					className: (0, _classnames2.default)(style.root, _defineProperty({}, style.scrolling, isScrolling)),
-					style: { lineHeight: rowHeight + 'px' },
+					style: containerStyle,
 					overscanRowCount: overscanMonthCount
 				});
 			}
@@ -17732,6 +17750,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	List.propTypes = {
 		width: _react.PropTypes.oneOfType([_react.PropTypes.number, _react.PropTypes.string]),
 		height: _react.PropTypes.number,
+		style: _react.PropTypes.object,
 		rowHeight: _react.PropTypes.number,
 		selectedDate: _react.PropTypes.object,
 		disabledDates: _react.PropTypes.arrayOf(_react.PropTypes.string),
@@ -20708,7 +20727,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: '_registerChild',
 	    value: function _registerChild(child) {
-	      if (child && child.constructor && child.constructor.name !== 'Grid' && child.constructor.name !== 'MultiGrid') {
+	      if (child && typeof child.recomputeGridSize !== 'function') {
 	        throw Error('Unexpected child type registered; only Grid/MultiGrid children are supported.');
 	      }
 
@@ -20904,7 +20923,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	      this.Grid.recomputeGridSize({
 	        rowIndex: index
 	      });
-	      this.forceUpdateGrid();
+	    }
+
+	    /** See Grid#scrollToCell */
+
+	  }, {
+	    key: 'scrollToRow',
+	    value: function scrollToRow() {
+	      var index = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
+
+	      this.Grid.scrollToCell({
+	        columnIndex: 0,
+	        rowIndex: index
+	      });
 	    }
 	  }, {
 	    key: 'componentDidMount',
@@ -24145,7 +24176,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	      this.Grid.recomputeGridSize({
 	        rowIndex: index
 	      });
-	      this.forceUpdateGrid();
+	    }
+
+	    /** See Grid#scrollToCell */
+
+	  }, {
+	    key: 'scrollToRow',
+	    value: function scrollToRow() {
+	      var index = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
+
+	      this.Grid.scrollToCell({
+	        columnIndex: 0,
+	        rowIndex: index
+	      });
 	    }
 	  }, {
 	    key: 'render',
@@ -24191,10 +24234,21 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	      var rowRenderer = this.props.rowRenderer;
 
-	      // By default, List cells should be 100% width.
-	      // This prevents them from flowing under a scrollbar (if present).
+	      // TRICKY The style object is sometimes cached by Grid.
+	      // This prevents new style objects from bypassing shallowCompare().
+	      // However as of React 16, style props are auto-frozen (at least in dev mode)
+	      // Check to make sure we can still modify the style before proceeding.
+	      // https://github.com/facebook/react/commit/977357765b44af8ff0cfea327866861073095c12#commitcomment-20648713
 
-	      style.width = '100%';
+	      var _Object$getOwnPropert = Object.getOwnPropertyDescriptor(style, 'width');
+
+	      var writable = _Object$getOwnPropert.writable;
+
+	      if (writable) {
+	        // By default, List cells should be 100% width.
+	        // This prevents them from flowing under a scrollbar (if present).
+	        style.width = '100%';
+	      }
 
 	      return rowRenderer(_extends({
 	        index: rowIndex,
@@ -24418,12 +24472,22 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 	  _createClass(MultiGrid, [{
-	    key: 'measureAllRows',
-	    value: function measureAllRows() {
+	    key: 'measureAllCells',
+	    value: function measureAllCells() {
 	      this._bottomLeftGrid && this._bottomLeftGrid.measureAllCells();
 	      this._bottomRightGrid && this._bottomRightGrid.measureAllCells();
 	      this._topLeftGrid && this._topLeftGrid.measureAllCells();
 	      this._topRightGrid && this._topRightGrid.measureAllCells();
+	    }
+
+	    /** See issue #546 */
+
+	  }, {
+	    key: 'measureAllRows',
+	    value: function measureAllRows() {
+	      console.warn('MultiGrid measureAllRows() is deprecated; use measureAllCells() instead.');
+
+	      this.measureAllCells();
 	    }
 
 	    /** See Grid#recomputeGridSize */
@@ -24442,22 +24506,29 @@ return /******/ (function(modules) { // webpackBootstrap
 	      var fixedRowCount = _props.fixedRowCount;
 
 
-	      this._bottomLeftGrid && this._bottomLeftGrid.measureAllCells({
+	      var adjustedColumnIndex = Math.max(0, columnIndex - fixedColumnCount);
+	      var adjustedRowIndex = Math.max(0, rowIndex - fixedRowCount);
+
+	      this._bottomLeftGrid && this._bottomLeftGrid.recomputeGridSize({
 	        columnIndex: columnIndex,
-	        rowIndex: rowIndex - fixedRowCount
+	        rowIndex: adjustedRowIndex
 	      });
-	      this._bottomRightGrid && this._bottomRightGrid.measureAllCells({
-	        columnIndex: columnIndex - fixedColumnCount,
-	        rowIndex: rowIndex - fixedRowCount
+	      this._bottomRightGrid && this._bottomRightGrid.recomputeGridSize({
+	        columnIndex: adjustedColumnIndex,
+	        rowIndex: adjustedRowIndex
 	      });
-	      this._topLeftGrid && this._topLeftGrid.measureAllCells({
+	      this._topLeftGrid && this._topLeftGrid.recomputeGridSize({
 	        columnIndex: columnIndex,
 	        rowIndex: rowIndex
 	      });
-	      this._topRightGrid && this._topRightGrid.measureAllCells({
-	        columnIndex: columnIndex - fixedColumnCount,
+	      this._topRightGrid && this._topRightGrid.recomputeGridSize({
+	        columnIndex: adjustedColumnIndex,
 	        rowIndex: rowIndex
 	      });
+
+	      this._leftGridWidth = null;
+	      this._topGridHeight = null;
+	      this._maybeCalculateCachedStyles(null, this.props);
 	    }
 	  }, {
 	    key: 'componentWillMount',
@@ -24728,7 +24799,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this._bottomLeftGridStyle = _extends({
 	          left: 0,
 	          outline: 0,
-	          overflow: 'hidden',
+	          overflowX: 'hidden',
+	          overflowY: 'hidden',
 	          position: 'absolute'
 	        }, styleBottomLeftGrid);
 	      }
@@ -24745,7 +24817,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this._topLeftGridStyle = _extends({
 	          left: 0,
 	          outline: 0,
-	          overflow: 'hidden',
+	          overflowX: 'hidden',
+	          overflowY: 'hidden',
 	          position: 'absolute',
 	          top: 0
 	        }, styleTopLeftGrid);
@@ -24755,7 +24828,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this._topRightGridStyle = _extends({
 	          left: this._getLeftGridWidth(props),
 	          outline: 0,
-	          overflow: 'hidden',
+	          overflowX: 'hidden',
+	          overflowY: 'hidden',
 	          position: 'absolute',
 	          top: 0
 	        }, styleTopRightGrid);
@@ -24794,7 +24868,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        columnCount: fixedColumnCount,
 	        height: this._getBottomGridHeight(props),
 	        ref: this._bottomLeftGridRef,
-	        rowCount: rowCount - fixedRowCount,
+	        rowCount: Math.max(0, rowCount - fixedRowCount),
 	        rowHeight: this._rowHeightBottomGrid,
 	        scrollTop: scrollTop,
 	        style: this._bottomLeftGridStyle,
@@ -24814,12 +24888,12 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	      return _react2.default.createElement(_Grid2.default, _extends({}, props, {
 	        cellRenderer: this._cellRendererBottomRightGrid,
-	        columnCount: columnCount - fixedColumnCount,
+	        columnCount: Math.max(0, columnCount - fixedColumnCount),
 	        columnWidth: this._columnWidthRightGrid,
 	        height: this._getBottomGridHeight(props),
 	        onScroll: this._onScroll,
 	        ref: this._bottomRightGridRef,
-	        rowCount: rowCount - fixedRowCount,
+	        rowCount: Math.max(0, rowCount - fixedRowCount),
 	        rowHeight: this._rowHeightBottomGrid,
 	        scrollToColumn: scrollToColumn - fixedColumnCount,
 	        scrollToRow: scrollToRow - fixedRowCount,
@@ -24862,7 +24936,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	      return _react2.default.createElement(_Grid2.default, _extends({}, props, {
 	        cellRenderer: this._cellRendererTopRightGrid,
-	        columnCount: columnCount - fixedColumnCount,
+	        columnCount: Math.max(0, columnCount - fixedColumnCount),
 	        columnWidth: this._columnWidthRightGrid,
 	        height: this._getTopGridHeight(props),
 	        ref: this._topRightGridRef,
@@ -25385,8 +25459,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * In this case the body’s top position will be a negative number and this element’s top will be increased (by that amount).
 	 */
 	function getPositionFromTop(element, container) {
+	  var offset = container === window ? 0 : getScrollTop(container);
 	  var containerElement = container === window ? document.documentElement : container;
-	  return element.getBoundingClientRect().top + getScrollTop(container) - containerElement.getBoundingClientRect().top;
+	  return element.getBoundingClientRect().top + offset - containerElement.getBoundingClientRect().top;
 	}
 
 	/**
