@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
 import VirtualList from 'react-tiny-virtual-list';
+import withScrollLock from '../utils/withScrollLock';
 import classNames from 'classnames';
 import {
   emptyFn,
@@ -15,6 +16,8 @@ import Month from '../Month';
 import styles from './MonthList.scss';
 
 const AVERAGE_ROWS_PER_MONTH = 5;
+
+const ListWithScrollLock = withScrollLock(VirtualList);
 
 export default class MonthList extends Component {
   static propTypes = {
@@ -174,7 +177,7 @@ export default class MonthList extends Component {
     const {scrollTop} = this.state;
 
     return (
-      <VirtualList
+      <ListWithScrollLock
         ref={this._getRef}
         width={width}
         height={height}
